@@ -15,17 +15,17 @@
  */
 package com.alibaba.csp.sentinel.node;
 
-import java.util.List;
-import java.util.Map;
-
 import com.alibaba.csp.sentinel.Entry;
 import com.alibaba.csp.sentinel.node.metric.MetricNode;
 import com.alibaba.csp.sentinel.slots.statistic.metric.DebugSupport;
 import com.alibaba.csp.sentinel.util.function.Predicate;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Holds real-time statistics for resources.
- *
+ * 保存某个资源的各种实时统计信息
  * @author qinan.qn
  * @author leyou
  * @author Eric Zhao

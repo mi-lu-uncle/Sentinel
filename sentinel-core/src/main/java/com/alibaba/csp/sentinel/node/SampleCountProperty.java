@@ -36,6 +36,7 @@ public class SampleCountProperty {
      * </p>
      * Node that this value must be divisor of 1000.
      */
+    // 时间窗口的采样个数，默认为2个采样窗口
     public static volatile int SAMPLE_COUNT = 2;
 
     public static void register2Property(SentinelProperty<Integer> property) {

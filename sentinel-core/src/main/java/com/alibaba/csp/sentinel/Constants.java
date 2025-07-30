@@ -72,6 +72,7 @@ public final class Constants {
 
     /**
      * Order of default processor slots
+     * (数字越大，优先级越低).
      */
     public static final int ORDER_NODE_SELECTOR_SLOT = -10000;
     public static final int ORDER_CLUSTER_BUILDER_SLOT = -9000;

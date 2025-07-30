@@ -15,10 +15,6 @@
  */
 package com.alibaba.csp.sentinel.context;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
-
 import com.alibaba.csp.sentinel.Constants;
 import com.alibaba.csp.sentinel.EntryType;
 import com.alibaba.csp.sentinel.SphO;
@@ -29,6 +25,10 @@ import com.alibaba.csp.sentinel.node.EntranceNode;
 import com.alibaba.csp.sentinel.node.Node;
 import com.alibaba.csp.sentinel.slotchain.StringResourceWrapper;
 import com.alibaba.csp.sentinel.slots.nodeselector.NodeSelectorSlot;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Utility class to get or create {@link Context} in current thread.
@@ -118,8 +118,10 @@ public class ContextUtil {
     }
 
     protected static Context trueEnter(String name, String origin) {
+        // 1.先从ThreadLocal中获取，如果能获取到直接返回，如果获取不到则继续第2步
         Context context = contextHolder.get();
         if (context == null) {
+            // 2.从一个static的map中根据上下文的名称获取，如果能获取到则直接返回，否则继续第3步
             Map<String, DefaultNode> localCacheNameMap = contextNameNodeMap;
             DefaultNode node = localCacheNameMap.get(name);
             if (node == null) {
@@ -127,6 +129,8 @@ public class ContextUtil {
                     setNullContext();
                     return NULL_CONTEXT;
                 } else {
+                    // 3.加锁后进行一次double check，如果还是没能从map中获取到，则创建一个EntranceNode，
+                    // 并把该EntranceNode添加到一个全局的ROOT节点中去，然后将该节点添加到map中去
                     LOCK.lock();
                     try {
                         node = contextNameNodeMap.get(name);
@@ -139,6 +143,7 @@ public class ContextUtil {
                                 // Add entrance node.
                                 Constants.ROOT.addChild(node);
 
+                                // 4.根据EntranceNode创建一个上下文，并将该上下文保存到ThreadLocal中去，下一个请求可以直接获取
                                 Map<String, DefaultNode> newMap = new HashMap<>(contextNameNodeMap.size() + 1);
                                 newMap.putAll(contextNameNodeMap);
                                 newMap.put(name, node);
@@ -198,6 +203,7 @@ public class ContextUtil {
      * ThreadLocal.
      */
     public static void exit() {
+        // 清除上下文
         Context context = contextHolder.get();
         if (context != null && context.getCurEntry() == null) {
             contextHolder.set(null);

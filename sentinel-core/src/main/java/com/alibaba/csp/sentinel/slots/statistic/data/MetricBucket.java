@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.LongAdder;
 
 /**
  * Represents metrics data in a period of time span.
- *
+ * 指标桶，例如通过数量、阻塞数量、异常数量、成功数量、响应时间，已通过未来配额（抢占下一个滑动窗口的数量）。
  * @author jialiang.linjl
  * @author Eric Zhao
  */

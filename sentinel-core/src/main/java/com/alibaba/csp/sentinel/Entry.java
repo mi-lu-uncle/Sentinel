@@ -60,20 +60,23 @@ public abstract class Entry implements AutoCloseable {
 
     protected static final Object[] OBJECTS0 = new Object[0];
 
+    // 当前Entry的创建时间，主要用来后期计算rt
     private final long createTimestamp;
     private long completeTimestamp;
 
-    // 当前统计节点
+    // 当前Entry所关联的node，该node主要是记录了当前context下该资源的统计信息
     private Node curNode;
     /**
      * {@link Node} of the specific origin, Usually the origin is the Service Consumer.
      */
-    // 来源统计节点
+    // 当前Entry的调用来源，通常是调用方的应用名称，在 ClusterBuilderSlot.entry() 方法中设置的
+    // 当前入口所关联的节点
     private Node originNode;
 
     private Throwable error;
     private BlockException blockError;
 
+    // 当前Entry所关联的资源
     protected final ResourceWrapper resourceWrapper;
 
     protected final int count;
@@ -184,7 +187,7 @@ public abstract class Entry implements AutoCloseable {
 
     /**
      * Get origin {@link Node} of the this {@link Entry}.
-     *
+     * 当前入口所关联的节点
      * @return origin {@link Node} of the this {@link Entry}, may be null if no origin specified by
      * {@link ContextUtil#enter(String name, String origin)}.
      */

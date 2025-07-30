@@ -15,13 +15,13 @@
  */
 package com.alibaba.csp.sentinel.slots.statistic.base;
 
+import com.alibaba.csp.sentinel.util.AssertUtil;
+import com.alibaba.csp.sentinel.util.TimeUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.concurrent.locks.ReentrantLock;
-
-import com.alibaba.csp.sentinel.util.AssertUtil;
-import com.alibaba.csp.sentinel.util.TimeUtil;
 
 /**
  * <p>
@@ -38,13 +38,19 @@ import com.alibaba.csp.sentinel.util.TimeUtil;
  * @author Eric Zhao
  * @author Carpenter Lee
  */
+// 滑动窗口顶层数据结构，包含一个一个的窗口数据。
 public abstract class LeapArray<T> {
 
+    // 每个样本窗口的时间间隔（ms）。windowLengthInMs = intervalInMs / sampleCount
     protected int windowLengthInMs;
+    // 一个滑动窗口中样本窗口个数（统计时间间隔中包含的样本窗口个数）。sampleCount = intervalInMs / windowLengthInMs
     protected int sampleCount;
+    // 滑动窗口：统计时间间隔（ms）
     protected int intervalInMs;
+    // 以秒为单位的时间间隔
     private double intervalInSecond;
 
+    // 样本窗口的数组，WindowWrap<MetricBucket>
     protected final AtomicReferenceArray<WindowWrap<T>> array;
 
     /**
@@ -98,12 +104,15 @@ public abstract class LeapArray<T> {
     protected abstract WindowWrap<T> resetWindowTo(WindowWrap<T> windowWrap, long startTime);
 
     private int calculateTimeIdx(/*@Valid*/ long timeMillis) {
+        // 当前时间戳/样本窗口时间长度(ms)
         long timeId = timeMillis / windowLengthInMs;
         // Calculate current index so we can map the timestamp to the leap array.
+        // 索引idx = timeId % 样本窗口个数
         return (int)(timeId % array.length());
     }
 
     protected long calculateWindowStart(/*@Valid*/ long timeMillis) {
+        // 计算当前样本窗口的起点 当前时间点-（当前时间点%样本窗口长度(ms)）
         return timeMillis - timeMillis % windowLengthInMs;
     }
 
@@ -118,8 +127,10 @@ public abstract class LeapArray<T> {
             return null;
         }
 
+        // 1.根据当前时间，算出该时间的timeId，并根据timeId算出当前窗口在采样窗口数组中的索引idx
         int idx = calculateTimeIdx(timeMillis);
         // Calculate current bucket start time.
+        // 2.根据当前时间算出当前窗口的应该对应的开始时间time，以毫秒为单位
         long windowStart = calculateWindowStart(timeMillis);
 
         /*

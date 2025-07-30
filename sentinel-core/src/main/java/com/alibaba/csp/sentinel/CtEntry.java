@@ -60,12 +60,22 @@ class CtEntry extends Entry {
         setUpEntryFor(context);
     }
 
+    /**
+     * 构建上下文调用链：
+     * 1.CtEntry(1):curEntry=CtEntry(1)
+     * 2.CtEntry(2):CtEntry(1).child=CtEntry(2) curEntry=CtEntry(2)
+     * 3.CtEntry(3):CtEntry(2).child=CtEntry(3) curEntry=CtEntry(3)
+     * ...
+     * 最终构造了一棵调用链的树，但是这棵树只有树干，没有叶子。（叶子节点curNode在NodeSelectorSlot中进行创建）
+     * @param context
+     */
     private void setUpEntryFor(Context context) {
         // The entry should not be associated to NullContext.
         // 入口节点上下文不能为NullContext
         if (context instanceof NullContext) {
             return;
         }
+        // 获取「上下文」中上一次的入口（首次调用 curEntry为空）
         this.parent = context.getCurEntry();
         if (parent != null) {
             ((CtEntry) parent).child = this;

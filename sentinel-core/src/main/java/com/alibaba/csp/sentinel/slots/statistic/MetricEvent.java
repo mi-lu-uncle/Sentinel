@@ -17,19 +17,23 @@ package com.alibaba.csp.sentinel.slots.statistic;
 
 /**
  * @author Eric Zhao
+ * 指标类型，例如通过数量、阻塞数量、异常数量、成功数量、响应时间等。
  */
 public enum MetricEvent {
 
     /**
      * Normal pass.
+     * 表示到来的数量，即此刻通过 Sentinel-Go 规则的流量数量
      */
     PASS,
     /**
      * Normal block.
+     * 表示被拦截的流量数量
      */
     BLOCK,
     EXCEPTION,
     SUCCESS,
+    // 单次请求的request time
     RT,
 
     /**
