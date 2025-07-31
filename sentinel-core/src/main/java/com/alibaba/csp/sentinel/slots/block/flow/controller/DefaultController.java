@@ -47,9 +47,14 @@ public class DefaultController implements TrafficShapingController {
 
     @Override
     public boolean canPass(Node node, int acquireCount, boolean prioritized) {
+        // 获取当前node节点的线程数或者请求通过的qps总数
+        // 获取当前时间窗已经统计的数据
         int curCount = avgUsedTokens(node);
+        // 当前请求数（请求的令牌）+ 申请总数（已经消耗的令牌）是否大于 该资源配置的总数（阈值）
+        // 以前的数据curCount + 新的数据acquireCount
         if (curCount + acquireCount > count) {
             if (prioritized && grade == RuleConstant.FLOW_GRADE_QPS) {
+                // 如果是优先级请求且为QPS限流，尝试抢占未来时间窗口的令牌
                 long currentTime;
                 long waitInMs;
                 currentTime = TimeUtil.currentTimeMillis();
@@ -60,6 +65,7 @@ public class DefaultController implements TrafficShapingController {
                     sleep(waitInMs);
 
                     // PriorityWaitException indicates that the request will pass after waiting for {@link @waitInMs}.
+                    // 如果抢占成功则等待指定时间后通过，否则直接拒绝
                     throw new PriorityWaitException(waitInMs);
                 }
             }

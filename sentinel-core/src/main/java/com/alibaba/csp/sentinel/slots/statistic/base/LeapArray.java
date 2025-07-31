@@ -47,7 +47,7 @@ public abstract class LeapArray<T> {
     protected int sampleCount;
     // 滑动窗口：统计时间间隔（ms）
     protected int intervalInMs;
-    // 以秒为单位的时间间隔
+    // 滑动窗口：统计时间间隔（秒,计算qps）
     private double intervalInSecond;
 
     // 样本窗口的数组，WindowWrap<MetricBucket>
@@ -142,6 +142,7 @@ public abstract class LeapArray<T> {
          */
         while (true) {
             WindowWrap<T> old = array.get(idx);
+            // 是否有窗口
             if (old == null) {
                 /*
                  *     B0       B1      B2    NULL      B4
@@ -197,6 +198,7 @@ public abstract class LeapArray<T> {
                 if (updateLock.tryLock()) {
                     try {
                         // Successfully get the update lock, now we reset the bucket.
+                        // 重置窗口数据
                         return resetWindowTo(old, windowStart);
                     } finally {
                         updateLock.unlock();

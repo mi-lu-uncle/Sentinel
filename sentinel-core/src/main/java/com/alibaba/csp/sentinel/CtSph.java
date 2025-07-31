@@ -111,27 +111,34 @@ public class CtSph implements Sph {
 
     private Entry entryWithPriority(ResourceWrapper resourceWrapper, int count, boolean prioritized, Object... args)
             throws BlockException {
+        // 从当前线程中获取上下文
+        // 一个请求会占用一个线程，并且绑定一个上下文
         Context context = ContextUtil.getContext();
-        // NullContext表示上下文数量超过限制
+        // 如果当前类型为NullContext，表示此时请求已经超出了阈值，无需检测规则
         if (context instanceof NullContext) {
             // The {@link NullContext} indicates that the amount of context has exceeded the threshold,
             // so here init the entry only. No rule checking will be done.
             return new CtEntry(resourceWrapper, null, context);
         }
 
+        // 此时如果获取Context为空，就创建默认的sentinel_default_context，并且会放入到当前线程中
         if (context == null) {
             // Using default context.
-            // 如果上下文为空，则使用默认上下文
             context = InternalContextUtil.internalEnter(Constants.CONTEXT_DEFAULT_NAME);
         }
 
         // Global switch is close, no rule checking will do.
-        // 如果 Sentinel 全局开关关闭，则跳过规则检查，直接返回 CtEntry。
+        // 如果 Sentinel 全局开关关闭，则跳过规则检查，直接返回无需检测规则。
         if (!Constants.ON) {
             return new CtEntry(resourceWrapper, null, context);
         }
 
-        // 获取或创建该资源对应的 SlotChain（规则处理链）
+        /*
+          获取或创建该资源对应的 SlotChain（规则处理链）。
+          这里是整个架构的核心所在，这里是在构建一个处理链，这个处理链是一个单向链表结构，类似于Filter一样，构建这个链条的
+          原因是对业务进行解耦，像限流资源保护有很多，比如限流、降级、热点参数、系统降级等等，如果都写在一起就耦合很严重，我们知道oop的
+          思想就是让每个类确定各自的职责，不要让他做不相干的事情，所以这里将业务进行全面解耦，然后在解耦的同时又通过链式编程将它们串起来
+         */
         ProcessorSlot<Object> chain = lookProcessChain(resourceWrapper);
 
         /*

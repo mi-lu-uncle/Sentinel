@@ -42,6 +42,7 @@ public @interface SentinelResource {
     EntryType entryType() default EntryType.OUT;
 
     /**
+     * @see com.alibaba.csp.sentinel.ResourceTypeConstants
      * @return the classification (type) of the resource
      * @since 1.7.0
      */

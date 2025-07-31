@@ -37,8 +37,9 @@ public class DefaultSlotChainBuilder implements SlotChainBuilder {
 
     @Override
     public ProcessorSlotChain build() {
+        // 创建DefaultProcessorSlotChain
         ProcessorSlotChain chain = new DefaultProcessorSlotChain();
-
+        // 读取配置文件在/META-INF/services/接口全限定命名的文件
         List<ProcessorSlot> sortedSlotList = SpiLoader.of(ProcessorSlot.class).loadInstanceListSorted();
         for (ProcessorSlot slot : sortedSlotList) {
             if (!(slot instanceof AbstractLinkedProcessorSlot)) {

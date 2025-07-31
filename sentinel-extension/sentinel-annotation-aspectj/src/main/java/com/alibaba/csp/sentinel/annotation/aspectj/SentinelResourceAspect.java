@@ -53,7 +53,9 @@ public class SentinelResourceAspect extends AbstractSentinelAspectSupport {
         int resourceType = annotation.resourceType();
         Entry entry = null;
         try {
+            // 创建资源操作对象
             entry = SphU.entry(resourceName, resourceType, entryType, pjp.getArgs());
+            // 调用原方法
             return pjp.proceed();
         } catch (BlockException ex) {
             return handleBlockException(pjp, annotation, ex);

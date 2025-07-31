@@ -15,16 +15,16 @@
  */
 package com.alibaba.csp.sentinel.node;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.LongAdder;
-
 import com.alibaba.csp.sentinel.node.metric.MetricNode;
 import com.alibaba.csp.sentinel.slots.statistic.metric.ArrayMetric;
 import com.alibaba.csp.sentinel.slots.statistic.metric.Metric;
 import com.alibaba.csp.sentinel.util.TimeUtil;
 import com.alibaba.csp.sentinel.util.function.Predicate;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * <p>The statistic node keep three kinds of real-time statistics metrics:</p>
@@ -208,6 +208,9 @@ public class StatisticNode implements Node {
 
     @Override
     public double successQps() {
+        // rollingCounterInSecond.success() 当前时间窗中统计的成功通过请求数量
+        // rollingCounterInSecond.getWindowIntervalInSec() 时间窗口长度
+        // 这两个数相除，计算出的就是QPS
         return rollingCounterInSecond.success() / rollingCounterInSecond.getWindowIntervalInSec();
     }
 

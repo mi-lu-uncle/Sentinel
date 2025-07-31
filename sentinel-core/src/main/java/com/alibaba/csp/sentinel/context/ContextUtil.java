@@ -52,6 +52,7 @@ public class ContextUtil {
     /**
      * Holds all {@link EntranceNode}. Each {@link EntranceNode} is associated with a distinct context name.
      */
+    // key值为：Context名称，value值为：EntranceNode
     private static volatile Map<String, DefaultNode> contextNameNodeMap = new HashMap<>();
 
     private static final ReentrantLock LOCK = new ReentrantLock();
@@ -118,13 +119,15 @@ public class ContextUtil {
     }
 
     protected static Context trueEnter(String name, String origin) {
-        // 1.先从ThreadLocal中获取，如果能获取到直接返回，如果获取不到则继续第2步
+        // 1.先从当前线程中获取Context，如果能获取到直接返回，如果获取不到则继续第2步
         Context context = contextHolder.get();
+        // 当前线程上下文为空
         if (context == null) {
-            // 2.从一个static的map中根据上下文的名称获取，如果能获取到则直接返回，否则继续第3步
+            // 2.从缓存中根据上下文的名称获取Context，如果能获取到则直接返回，否则继续第3步
             Map<String, DefaultNode> localCacheNameMap = contextNameNodeMap;
             DefaultNode node = localCacheNameMap.get(name);
             if (node == null) {
+                // 当前缓存的 size> Context的最大数量，返回NULL_Context类型,忽略检测
                 if (localCacheNameMap.size() > Constants.MAX_CONTEXT_NAME_SIZE) {
                     setNullContext();
                     return NULL_CONTEXT;
@@ -139,11 +142,13 @@ public class ContextUtil {
                                 setNullContext();
                                 return NULL_CONTEXT;
                             } else {
+                                // 4.node赋值为EntranceNode
                                 node = new EntranceNode(new StringResourceWrapper(name, EntryType.IN), null);
                                 // Add entrance node.
+                                // 5.将Node添加到Root节点中去
                                 Constants.ROOT.addChild(node);
 
-                                // 4.根据EntranceNode创建一个上下文，并将该上下文保存到ThreadLocal中去，下一个请求可以直接获取
+                                // 6.将新建的EntranceNode添加到缓存中,写时复制（Copy-On-Write）
                                 Map<String, DefaultNode> newMap = new HashMap<>(contextNameNodeMap.size() + 1);
                                 newMap.putAll(contextNameNodeMap);
                                 newMap.put(name, node);
@@ -155,6 +160,7 @@ public class ContextUtil {
                     }
                 }
             }
+            // 7.根据EntranceNode创建一个上下文，并将该上下文保存到ThreadLocal中去，下一个请求可以直接获取
             context = new Context(node, name);
             context.setOrigin(origin);
             contextHolder.set(context);

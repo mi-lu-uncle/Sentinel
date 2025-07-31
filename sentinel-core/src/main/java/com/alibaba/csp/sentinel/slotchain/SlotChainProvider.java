@@ -41,6 +41,7 @@ public final class SlotChainProvider {
         }
 
         // Resolve the slot chain builder SPI.
+        // 读取配置文件在/META-INF/services/接口全限定命名的文件中配置实现类.
         slotChainBuilder = SpiLoader.of(SlotChainBuilder.class).loadFirstInstanceOrDefault();
 
         if (slotChainBuilder == null) {

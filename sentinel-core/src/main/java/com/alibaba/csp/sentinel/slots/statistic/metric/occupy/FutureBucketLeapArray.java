@@ -48,6 +48,7 @@ public class FutureBucketLeapArray extends LeapArray<MetricBucket> {
     @Override
     public boolean isWindowDeprecated(long time, WindowWrap<MetricBucket> windowWrap) {
         // Tricky: will only calculate for future.
+        // 当前时间>样本窗口起始时间 说明过时了
         return time >= windowWrap.windowStart();
     }
 }
