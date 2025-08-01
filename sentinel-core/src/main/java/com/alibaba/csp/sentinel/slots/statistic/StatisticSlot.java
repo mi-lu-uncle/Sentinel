@@ -130,6 +130,7 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
     public void exit(Context context, ResourceWrapper resourceWrapper, int count, Object... args) {
         Node node = context.getCurNode();
 
+        // 进入资源时未出现 blockException，记录相关值（rt、successCount、exceptionQps）
         if (context.getCurEntry().getBlockError() == null) {
             // Calculate response time (use completeStatTime as the time of completion).
             long completeStatTime = TimeUtil.currentTimeMillis();

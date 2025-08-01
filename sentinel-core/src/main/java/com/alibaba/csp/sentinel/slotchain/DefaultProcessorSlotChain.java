@@ -47,7 +47,8 @@ public class DefaultProcessorSlotChain extends ProcessorSlotChain {
      *  3. end 节点额外指向 first 节点形成特殊连接
      *  4. 蓝色节点表示有效数据，粉色节点表示空指针
      */
-    AbstractLinkedProcessorSlot<?> first = new AbstractLinkedProcessorSlot<Object>() {
+    // 头节点
+    AbstractLinkedProcessorSlot<?> first = new AbstractLinkedProcessorSlot<>() {
 
         @Override
         public void entry(Context context, ResourceWrapper resourceWrapper, Object t, int count, boolean prioritized, Object... args)

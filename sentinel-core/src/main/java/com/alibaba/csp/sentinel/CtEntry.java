@@ -56,7 +56,7 @@ class CtEntry extends Entry {
         this.chain = chain;
         this.context = context;
 
-        // 将当前 Entry 接到传入 Context 的调用链路上
+        // 将当前 Entry 接到传入 Context 的调用链路上.构造CtEntry#parent链路
         setUpEntryFor(context);
     }
 
