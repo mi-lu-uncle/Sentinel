@@ -70,7 +70,7 @@ public abstract class Entry implements AutoCloseable {
      * {@link Node} of the specific origin, Usually the origin is the Service Consumer.
      */
     // 当前Entry的调用来源，通常是调用方的应用名称，在 ClusterBuilderSlot.entry() 方法中设置的
-    // 当前入口所关联的节点
+    // 当前入口所关联的StatisticNode节点
     private Node originNode;
 
     private Throwable error;

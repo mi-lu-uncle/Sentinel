@@ -15,14 +15,13 @@
  */
 package com.alibaba.csp.sentinel.node;
 
+import com.alibaba.csp.sentinel.ResourceTypeConstants;
+import com.alibaba.csp.sentinel.context.ContextUtil;
+import com.alibaba.csp.sentinel.util.AssertUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-
-import com.alibaba.csp.sentinel.ResourceTypeConstants;
-import com.alibaba.csp.sentinel.context.ContextUtil;
-import com.alibaba.csp.sentinel.slots.block.BlockException;
-import com.alibaba.csp.sentinel.util.AssertUtil;
 
 /**
  * <p>
@@ -106,6 +105,7 @@ public class ClusterNode extends StatisticNode {
                 statisticNode = originCountMap.get(origin);
                 if (statisticNode == null) {
                     // The node is absent, create a new node for the origin.
+                    // 节点不存在，为origin创建一个新节点
                     statisticNode = new StatisticNode();
                     HashMap<String, StatisticNode> newMap = new HashMap<>(originCountMap.size() + 1);
                     newMap.putAll(originCountMap);

@@ -34,6 +34,7 @@ import java.util.LinkedList;
  */
 class CtEntry extends Entry {
 
+    // setUpEntryFor进行构建
     protected Entry parent = null;
     protected Entry child = null;
 
